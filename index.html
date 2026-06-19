@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusPass // Ultimate Password Generator</title>
+  <meta name="description" content="Generate cryptographically secure, high-entropy passwords with detailed security metrics, brute-force crack time estimates, bulk generation, and local history.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Background decorative glowing orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <i data-lucide="shield-alert" class="logo-icon"></i>
+        <h1>Nexus<span>Pass</span></h1>
+      </div>
+      <p class="subtitle">Secure Offline Entropy Generator</p>
+      
+      <!-- Secure Badge -->
+      <div class="security-badge">
+        <i data-lucide="shield-check"></i>
+        <span>100% Client-Side Secure</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="single-pane">
+        <i data-lucide="key-round"></i> Single Generator
+      </button>
+      <button class="tab-btn" data-tab="bulk-pane">
+        <i data-lucide="layers"></i> Bulk Generator
+      </button>
+    </nav>
+
+    <!-- Main Workspace Layout -->
+    <main class="workspace">
+      
+      <!-- Left Column: Generator Panels -->
+      <div class="generator-column">
+        
+        <!-- Single Generator Pane -->
+        <section id="single-pane" class="tab-content active">
+          <!-- Password Output Glass Card -->
+          <div class="card output-card">
+            <div class="password-display-wrapper">
+              <span id="password-placeholder" class="hidden">Click Generate</span>
+              <div id="password-output" class="password-text" title="Click to copy">••••••••••••••••</div>
+              <div class="output-actions">
+                <button id="regenerate-btn" class="action-btn" title="Regenerate Password">
+                  <i data-lucide="refresh-cw"></i>
+                </button>
+                <button id="copy-btn" class="action-btn primary-action" title="Copy to Clipboard">
+                  <i data-lucide="copy" id="copy-icon"></i>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Quick Strength Bar underneath display -->
+            <div class="quick-strength-container">
+              <div class="strength-bar-wrapper">
+                <div id="strength-bar" class="strength-bar" style="width: 0%;"></div>
+              </div>
+              <div class="strength-label-row">
+                <span class="label-text">Strength Assessment:</span>
+                <span id="strength-badge" class="strength-badge weak">Empty</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Configuration Card -->
+          <div class="card config-card">
+            <h2>Generator Settings</h2>
+            
+            <!-- Length Selector -->
+            <div class="setting-group slider-group">
+              <div class="setting-label-row">
+                <label for="length-slider">Password Length</label>
+                <div class="length-counter">
+                  <input type="number" id="length-number" min="4" max="128" value="16">
+                  <span>chars</span>
+                </div>
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="length-slider" min="4" max="128" value="16">
+              </div>
+            </div>
+
+            <!-- Essential Toggles -->
+            <div class="checkbox-grid">
+              <label class="custom-toggle">
+                <input type="checkbox" id="include-upper" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Uppercase <span class="char-hint">(A-Z)</span></span>
+              </label>
+
+              <label class="custom-toggle">
+                <input type="checkbox" id="include-lower" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Lowercase <span class="char-hint">(a-z)</span></span>
+              </label>
+
+              <label class="custom-toggle">
+                <input type="checkbox" id="include-numbers" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Numbers <span class="char-hint">(0-9)</span></span>
+              </label>
+
+              <label class="custom-toggle">
+                <input type="checkbox" id="include-symbols" checked>
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">Symbols <span class="char-hint">(!@#$)</span></span>
+              </label>
+            </div>
+
+            <!-- Advanced Settings Accordion -->
+            <div class="accordion">
+              <button id="accordion-toggle" class="accordion-header">
+                <span>Advanced Parameters</span>
+                <i data-lucide="chevron-down" class="accordion-arrow"></i>
+              </button>
+              <div id="accordion-body" class="accordion-content">
+                <div class="advanced-settings-grid">
+                  
+                  <label class="custom-toggle">
+                    <input type="checkbox" id="exclude-similar">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Avoid Similar Characters <span class="char-hint">(e.g. i, l, 1, O, 0)</span></span>
+                  </label>
+
+                  <label class="custom-toggle">
+                    <input type="checkbox" id="readable-pass">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Pronounceable / Readable <span class="char-hint">(vowel-consonant mix)</span></span>
+                  </label>
+
+                  <div class="setting-input-wrapper">
+                    <label for="custom-symbols">Custom Symbols Set</label>
+                    <input type="text" id="custom-symbols" value="!@#$%^&*()_+-=[]{}|;:,.<>?">
+                  </div>
+                  
+                  <div class="setting-input-wrapper">
+                    <label for="exclude-chars">Characters to Exclude</label>
+                    <input type="text" id="exclude-chars" placeholder="e.g. @, #, 9">
+                  </div>
+
+                  <label class="custom-toggle">
+                    <input type="checkbox" id="auto-copy">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Auto-Copy to Clipboard <span class="char-hint">(on generate)</span></span>
+                  </label>
+
+                </div>
+              </div>
+            </div>
+            
+            <button id="generate-trigger" class="btn btn-primary">
+              <i data-lucide="key"></i> Generate Security Key
+            </button>
+          </div>
+        </section>
+
+        <!-- Bulk Generator Pane -->
+        <section id="bulk-pane" class="tab-content">
+          <div class="card config-card">
+            <h2>Bulk Key Generator</h2>
+            <p class="pane-description">Generate multiple passwords matching your current configuration simultaneously.</p>
+            
+            <div class="setting-group slider-group">
+              <div class="setting-label-row">
+                <label for="bulk-qty-slider">Quantity to Generate</label>
+                <div class="length-counter">
+                  <input type="number" id="bulk-qty-number" min="5" max="100" value="10">
+                  <span>keys</span>
+                </div>
+              </div>
+              <div class="slider-wrapper">
+                <input type="range" id="bulk-qty-slider" min="5" max="100" value="10">
+              </div>
+            </div>
+
+            <div class="bulk-actions-row">
+              <button id="bulk-generate-trigger" class="btn btn-primary">
+                <i data-lucide="sparkles"></i> Generate Bulk Keys
+              </button>
+              <div class="bulk-exports hidden" id="bulk-exports">
+                <button id="bulk-copy-all" class="btn btn-secondary btn-sm" title="Copy all to clipboard">
+                  <i data-lucide="copy"></i> Copy All
+                </button>
+                <button id="bulk-download-txt" class="btn btn-secondary btn-sm" title="Download as text file">
+                  <i data-lucide="download"></i> Download TXT
+                </button>
+              </div>
+            </div>
+
+            <!-- Bulk Output List -->
+            <div class="bulk-output-wrapper hidden" id="bulk-output-wrapper">
+              <div class="bulk-output-header">
+                <span>Generated Keys</span>
+                <span class="bulk-count" id="bulk-count-badge">0 Keys</span>
+              </div>
+              <div class="bulk-list" id="bulk-list-container">
+                <!-- Javascript populated list items -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Analytics & History -->
+      <aside class="sidebar-column">
+        
+        <!-- Entropy & Security Analysis Card -->
+        <section class="card analytics-card">
+          <h2>Security Audit</h2>
+          
+          <div class="audit-grid">
+            <div class="audit-metric">
+              <div class="metric-visual">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="entropy-progress" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="metric-number" id="entropy-val">0</div>
+              </div>
+              <div class="metric-info">
+                <h3>Entropy</h3>
+                <p>Bits of security</p>
+              </div>
+            </div>
+
+            <!-- Crack Time Benchmarks -->
+            <div class="crack-times">
+              <h3>Estimated Crack Time</h3>
+              <div class="benchmark-item">
+                <span class="device"><i data-lucide="cpu"></i> Online Attack</span>
+                <span class="time" id="crack-online">N/A</span>
+              </div>
+              <div class="benchmark-item">
+                <span class="device"><i data-lucide="server"></i> Desktop PC (GPU)</span>
+                <span class="time" id="crack-gpu">N/A</span>
+              </div>
+              <div class="benchmark-item">
+                <span class="device"><i data-lucide="database"></i> Supercomputer</span>
+                <span class="time" id="crack-super">N/A</span>
+              </div>
+            </div>
+
+            <!-- Requirements checklist -->
+            <div class="checklist">
+              <h3>Security Checks</h3>
+              <ul>
+                <li id="chk-length"><i data-lucide="circle" class="check-icon"></i> Minimum 12 characters</li>
+                <li id="chk-casing"><i data-lucide="circle" class="check-icon"></i> Mixed casing (A/a)</li>
+                <li id="chk-numbers"><i data-lucide="circle" class="check-icon"></i> Numbers included</li>
+                <li id="chk-symbols"><i data-lucide="circle" class="check-icon"></i> Symbols included</li>
+                <li id="chk-entropy"><i data-lucide="circle" class="check-icon"></i> High Entropy (>60 bits)</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Local History Card -->
+        <section class="card history-card">
+          <div class="history-header">
+            <h2>History</h2>
+            <div class="history-controls">
+              <button id="history-visibility-btn" class="icon-btn-toggle" title="Reveal/Mask History">
+                <i data-lucide="eye-off" id="history-eye-icon"></i>
+              </button>
+              <button id="clear-history-btn" class="icon-btn-danger" title="Clear History Log">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </div>
+          <div class="history-list-wrapper">
+            <div id="history-empty" class="history-empty">No passwords generated yet</div>
+            <ul id="history-list" class="history-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </section>
+
+      </aside>
+    </main>
+  </div>
+
+  <!-- Toast Notification Overlay -->
+  <div id="toast" class="toast-container">
+    <i data-lucide="check-circle" class="toast-icon"></i>
+    <span id="toast-message" class="toast-text">Password copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
